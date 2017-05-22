@@ -47,10 +47,9 @@ export class HackerNewsAPIService {
 
 function lazyFetch(url, options?) {
   return new Observable(fetchObserver => {
-    let cancelToken = false;
     fetch(url, options)
       .then(res => {
-        if (!cancelToken) {
+        if (!fetchObserver.closed) {
           return res.json()
             .then(data => {
               fetchObserver.next(data);
@@ -58,9 +57,6 @@ function lazyFetch(url, options?) {
             });
         }
       }).catch(err => fetchObserver.error(err));
-      return () => {
-        cancelToken = true;
-      };
   });
 }
 
